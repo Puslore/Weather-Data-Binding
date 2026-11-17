@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <data>
+        <variable
+            name="weather"
+            type="com.example.weatherdatabinding.WeatherData" />
+        <import type="android.graphics.Color" />
+        <import type="android.view.View" />
+    </data>
+
+    <LinearLayout
+        android:id="@+id/main"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <!-- Выпадающее меню выбора города -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Выберите город:"
+            android:textSize="16sp" />
+
+        <Spinner
+            android:id="@+id/spinnerCities"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginTop="4dp"
+            android:entries="@array/cities" />
+
+        <Button
+            android:id="@+id/btnLoad"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:onClick="onClick"
+            android:text="Обновить" />
+
+        <!-- Сообщение об ошибке -->
+        <TextView
+            android:id="@+id/tvError"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="@{weather.error}"
+            android:textColor="#FF0000"
+            android:textSize="16sp"
+            android:visibility="@{ weather.error != null ? View.VISIBLE : View.GONE }" />
+
+        <!-- Блок отображения сведений о погоде -->
+        <LinearLayout
+            android:id="@+id/weatherInfo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:orientation="vertical"
+            android:visibility="@{ weather.hasData ? View.VISIBLE : View.GONE }">
+
+            <TextView
+                android:id="@+id/tvCity"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@{weather.cityName}"
+                android:textSize="26sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvTemp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:background="@{ weather.temp > 0 ? Color.YELLOW : Color.CYAN }"
+                android:padding="8dp"
+                android:text="@{String.format(&quot;Температура: %.1f °C&quot;, weather.temp)}"
+                android:textSize="22sp" />
+
+            <TextView
+                android:id="@+id/tvDescription"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="@{weather.description}"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/tvClouds"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="@{String.format(&quot;Облачность: %d%%&quot;, weather.clouds)}"
+                android:textSize="16sp" />
+
+            <!-- Картинка облачности -->
+            <ImageView
+                android:id="@+id/ivClouds"
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                android:layout_marginTop="4dp"
+                android:alpha="@{weather.cloudAlpha}"
+                android:src="@drawable/ic_cloud" />
+
+            <TextView
+                android:id="@+id/tvWind"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="@{String.format(&quot;Ветер: %.1f м/с, %.0f°&quot;, weather.windSpeed, weather.windDeg)}"
+                android:textSize="16sp" />
+
+            <!-- Картинка направления ветра (поворот через data binding) -->
+            <ImageView
+                android:id="@+id/ivWindDirection"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:layout_marginTop="4dp"
+                android:rotation="@{weather.windDeg}"
+                android:src="@android:drawable/arrow_up_float" />
+
+            <TextView
+                android:id="@+id/tvHumidity"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="@{String.format(&quot;Влажность: %d%%&quot;, weather.humidity)}"
+                android:textSize="16sp" />
+
+            <TextView
+                android:id="@+id/tvPressure"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="@{String.format(&quot;Давление: %.0f гПа&quot;, weather.pressure)}"
+                android:textSize="16sp" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+</layout>

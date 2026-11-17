@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">WeatherDataBinding</string>
+
+    <string-array name="cities">
+        <item>Иркутск</item>
+        <item>Москва</item>
+        <item>Санкт-Петербург</item>
+        <item>Новосибирск</item>
+        <item>Владивосток</item>
+        <item>Лондон</item>
+    </string-array>
+</resources>
