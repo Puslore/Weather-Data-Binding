@@ -1,6 +1,13 @@
 <resources>
     <string name="app_name">WeatherDataBinding</string>
 
+    <string name="city_label">Выберите город:</string>
+    <string name="temperature_unit_label">Шкала температуры:</string>
+    <string name="temperature_unit_celsius">°C</string>
+    <string name="temperature_unit_fahrenheit">°F</string>
+    <string name="show_wind_direction">Показывать направление ветра</string>
+    <string name="refresh">Обновить</string>
+
     <string-array name="cities">
         <item>Иркутск</item>
         <item>Москва</item>

@@ -6,10 +6,10 @@ import android.view.View
 import android.widget.AdapterView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.lifecycleScope
 import com.example.weatherdatabinding.databinding.ActivityMainBinding
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.InputStream
@@ -27,6 +27,8 @@ class MainActivity : AppCompatActivity() {
         // Инициализируем data binding
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
         binding.weather = WeatherData()
+        binding.useFahrenheit = false
+        binding.showWind = true
 
         // Слушатель выбора города в выпадающем меню
         binding.spinnerCities.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
@@ -37,10 +39,30 @@ class MainActivity : AppCompatActivity() {
 
             override fun onNothingSelected(parent: AdapterView<*>?) {}
         }
+
+        // Переключение шкалы температуры (C / F)
+        binding.rgTemperatureUnit.setOnCheckedChangeListener { _, checkedId ->
+            binding.useFahrenheit = checkedId == R.id.rbFahrenheit
+        }
+
+        // Показ/скрытие направления ветра
+        binding.cbShowWind.setOnCheckedChangeListener { _, isChecked ->
+            binding.showWind = isChecked
+        }
     }
 
     suspend fun loadWeather(city: String) {
         val apiKey = getString(R.string.weather_api_key)
+        if (apiKey.isBlank()) {
+            withContext(Dispatchers.Main) {
+                binding.weather = WeatherData(
+                    hasData = false,
+                    error = "API ключ не найден. Задайте WEATHER_API_KEY в .env файле"
+                )
+            }
+            return
+        }
+
         val encodedCity = URLEncoder.encode(city.trim(), "UTF-8")
         val weatherURL = "https://api.openweathermap.org/data/2.5/weather?q=$encodedCity&appid=$apiKey&units=metric&lang=ru"
 
@@ -57,19 +79,7 @@ class MainActivity : AppCompatActivity() {
             Log.d("mytag", data)
 
             val response = Gson().fromJson(data, WeatherResponse::class.java)
-
-            val newWeatherData = WeatherData(
-                cityName = response.name,
-                temp = response.main?.temp ?: 0.0,
-                description = response.weather?.firstOrNull()?.description ?: "",
-                humidity = response.main?.humidity ?: 0,
-                pressure = response.main?.pressure ?: 0.0,
-                windSpeed = response.wind?.speed ?: 0.0,
-                windDeg = response.wind?.deg ?: 0f,
-                clouds = response.clouds?.all ?: 0,
-                hasData = true,
-                error = null
-            )
+            val newWeatherData = response.toWeatherData()
 
             withContext(Dispatchers.Main) {
                 binding.weather = newWeatherData
@@ -85,13 +95,13 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    public fun onClick(v: View) {
+    fun onClick(v: View) {
         val city = binding.spinnerCities.selectedItem?.toString() ?: "Иркутск"
         loadWeatherAsync(city)
     }
 
     private fun loadWeatherAsync(city: String) {
-        GlobalScope.launch(Dispatchers.IO) {
+        lifecycleScope.launch(Dispatchers.IO) {
             loadWeather(city)
         }
     }

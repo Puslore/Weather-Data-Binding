@@ -5,136 +5,203 @@
         <variable
             name="weather"
             type="com.example.weatherdatabinding.WeatherData" />
+        <variable
+            name="useFahrenheit"
+            type="boolean" />
+        <variable
+            name="showWind"
+            type="boolean" />
         <import type="android.graphics.Color" />
         <import type="android.view.View" />
     </data>
 
-    <LinearLayout
-        android:id="@+id/main"
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:padding="16dp">
+        android:fillViewport="true">
 
-        <!-- Выпадающее меню выбора города -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Выберите город:"
-            android:textSize="16sp" />
-
-        <Spinner
-            android:id="@+id/spinnerCities"
-            android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:layout_marginTop="4dp"
-            android:entries="@array/cities" />
-
-        <Button
-            android:id="@+id/btnLoad"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:onClick="onClick"
-            android:text="Обновить" />
-
-        <!-- Сообщение об ошибке -->
-        <TextView
-            android:id="@+id/tvError"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:text="@{weather.error}"
-            android:textColor="#FF0000"
-            android:textSize="16sp"
-            android:visibility="@{ weather.error != null ? View.VISIBLE : View.GONE }" />
-
-        <!-- Блок отображения сведений о погоде -->
         <LinearLayout
-            android:id="@+id/weatherInfo"
+            android:id="@+id/main"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
             android:orientation="vertical"
-            android:visibility="@{ weather.hasData ? View.VISIBLE : View.GONE }">
+            android:padding="16dp">
 
+            <!-- Выпадающее меню выбора города -->
             <TextView
-                android:id="@+id/tvCity"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@{weather.cityName}"
-                android:textSize="26sp"
-                android:textStyle="bold" />
+                android:text="@string/city_label"
+                android:textSize="16sp" />
 
-            <TextView
-                android:id="@+id/tvTemp"
+            <Spinner
+                android:id="@+id/spinnerCities"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="48dp"
                 android:layout_marginTop="4dp"
-                android:background="@{ weather.temp > 0 ? Color.YELLOW : Color.CYAN }"
-                android:padding="8dp"
-                android:text="@{String.format(&quot;Температура: %.1f °C&quot;, weather.temp)}"
-                android:textSize="22sp" />
+                android:entries="@array/cities" />
 
+            <!-- Выбор шкалы температуры -->
             <TextView
-                android:id="@+id/tvDescription"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:text="@string/temperature_unit_label"
+                android:textSize="16sp" />
+
+            <RadioGroup
+                android:id="@+id/rgTemperatureUnit"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <RadioButton
+                    android:id="@+id/rbCelsius"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:checked="true"
+                    android:text="@string/temperature_unit_celsius" />
+
+                <RadioButton
+                    android:id="@+id/rbFahrenheit"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:text="@string/temperature_unit_fahrenheit" />
+            </RadioGroup>
+
+            <!-- Отображение направления ветра -->
+            <CheckBox
+                android:id="@+id/cbShowWind"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:text="@{weather.description}"
-                android:textSize="18sp" />
+                android:checked="true"
+                android:text="@string/show_wind_direction" />
 
-            <TextView
-                android:id="@+id/tvClouds"
+            <Button
+                android:id="@+id/btnLoad"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:text="@{String.format(&quot;Облачность: %d%%&quot;, weather.clouds)}"
-                android:textSize="16sp" />
+                android:onClick="onClick"
+                android:text="@string/refresh" />
 
-            <!-- Картинка облачности -->
-            <ImageView
-                android:id="@+id/ivClouds"
-                android:layout_width="64dp"
-                android:layout_height="64dp"
-                android:layout_marginTop="4dp"
-                android:alpha="@{weather.cloudAlpha}"
-                android:src="@drawable/ic_cloud" />
-
+            <!-- Сообщение об ошибке -->
             <TextView
-                android:id="@+id/tvWind"
+                android:id="@+id/tvError"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:text="@{String.format(&quot;Ветер: %.1f м/с, %.0f°&quot;, weather.windSpeed, weather.windDeg)}"
-                android:textSize="16sp" />
+                android:text="@{weather.error}"
+                android:textColor="#FF0000"
+                android:textSize="16sp"
+                android:visibility="@{ weather.error != null ? View.VISIBLE : View.GONE }" />
 
-            <!-- Картинка направления ветра (поворот через data binding) -->
-            <ImageView
-                android:id="@+id/ivWindDirection"
-                android:layout_width="60dp"
-                android:layout_height="60dp"
-                android:layout_marginTop="4dp"
-                android:rotation="@{weather.windDeg}"
-                android:src="@android:drawable/arrow_up_float" />
-
-            <TextView
-                android:id="@+id/tvHumidity"
+            <!-- Блок отображения сведений о погоде -->
+            <LinearLayout
+                android:id="@+id/weatherInfo"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:text="@{String.format(&quot;Влажность: %d%%&quot;, weather.humidity)}"
-                android:textSize="16sp" />
+                android:layout_marginTop="16dp"
+                android:orientation="vertical"
+                android:visibility="@{ weather.hasData ? View.VISIBLE : View.GONE }">
 
-            <TextView
-                android:id="@+id/tvPressure"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:text="@{String.format(&quot;Давление: %.0f гПа&quot;, weather.pressure)}"
-                android:textSize="16sp" />
+                <TextView
+                    android:id="@+id/tvCity"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@{weather.cityName}"
+                    android:textSize="26sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tvTemp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:background="@{ weather.temp > 0 ? Color.YELLOW : Color.CYAN }"
+                    android:padding="8dp"
+                    android:text="@{weather.formatTemperature(useFahrenheit)}"
+                    android:textSize="22sp" />
+
+                <TextView
+                    android:id="@+id/tvDescription"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="@{weather.description}"
+                    android:textSize="18sp" />
+
+                <TextView
+                    android:id="@+id/tvClouds"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="@{String.format(&quot;Облачность: %d%%&quot;, weather.clouds)}"
+                    android:textSize="16sp" />
+
+                <!-- Картинка облачности -->
+                <ImageView
+                    android:id="@+id/ivClouds"
+                    android:layout_width="64dp"
+                    android:layout_height="64dp"
+                    android:layout_marginTop="4dp"
+                    android:alpha="@{weather.cloudAlpha}"
+                    android:src="@drawable/ic_cloud" />
+
+                <TextView
+                    android:id="@+id/tvWind"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="@{String.format(&quot;Ветер: %.1f м/с&quot;, weather.windSpeed)}"
+                    android:textSize="16sp" />
+
+                <!-- Направление ветра: показывается только при включённом CheckBox -->
+                <LinearLayout
+                    android:id="@+id/windDirectionBlock"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:visibility="@{ showWind ? View.VISIBLE : View.GONE }">
+
+                    <ImageView
+                        android:id="@+id/ivWindDirection"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:rotation="@{weather.windDeg}"
+                        android:src="@android:drawable/arrow_up_float" />
+
+                    <TextView
+                        android:id="@+id/tvWindDirection"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:text="@{String.format(&quot;Направление: %.0f°&quot;, weather.windDeg)}"
+                        android:textSize="16sp" />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/tvHumidity"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="@{String.format(&quot;Влажность: %d%%&quot;, weather.humidity)}"
+                    android:textSize="16sp" />
+
+                <TextView
+                    android:id="@+id/tvPressure"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="@{String.format(&quot;Давление: %.0f гПа&quot;, weather.pressure)}"
+                    android:textSize="16sp" />
+
+            </LinearLayout>
 
         </LinearLayout>
-
-    </LinearLayout>
+    </ScrollView>
 </layout>
